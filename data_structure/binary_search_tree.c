@@ -8,8 +8,11 @@ typedef struct node {
 } node_t;
 
 void insert(node_t **ptr_root, int val);
-void bfs(node_t *node);
+void inorder_tree_walk(node_t *node);
+node_t* search(node_t *node, int val);
 void delete_tree(node_t *node);
+node_t* minimum(node_t *node);
+node_t* maximum(node_t *node);
 
 int main() {
     node_t *root = NULL;
@@ -22,7 +25,11 @@ int main() {
     insert(&root, 6);
     insert(&root, 8);
 
-    bfs(root);
+    printf("찾은 값: %d\n", search(root, 8)->val);
+    printf("찾은 값: %d\n", minimum(root)->val);
+    printf("찾은 값: %d\n", maximum(root)->val);
+
+    inorder_tree_walk(root);
     delete_tree(root);
 }
 
@@ -64,24 +71,56 @@ void insert(node_t **ptr_root, int val) {
     }
 }
 
-void bfs(node_t *node) {
-    if (node == NULL)
+void inorder_tree_walk(node_t *node) {
+    node_t *current = node;
+    if (current == NULL)
         return;
     else {
-        bfs(node->left);
-        printf("{ %d }\n", node->val);
-        bfs(node->right);
+        inorder_tree_walk(current->left);
+        printf("{ %d }\n", current->val);
+        inorder_tree_walk(current->right);
     }
 }
 
+node_t* search(node_t *node, int val) {
+    node_t *current = node;
+    while (current != NULL && current->val != val){
+        if (val > current->val)
+            current = current->right;
+        else
+            current = current->left;
+    }
+
+    return current;
+}
+
 void delete_tree(node_t *node) {
-    if (node == NULL)
+    node_t *current = node;
+    if (current == NULL)
         return;
     else {
-        node_t *left_node = node->left;
-        node_t *right_node = node->right;
-        free(node);
+        node_t *left_node = current->left;
+        node_t *right_node = current->right;
+        free(current);
         delete_tree(left_node);
         delete_tree(right_node);
     }
+}
+
+node_t* minimum(node_t *node){
+    node_t *current = node;
+    if (current == NULL)
+        return current;
+    while (current->left != NULL)
+        current = current->left;
+    return current;
+}
+
+node_t* maximum(node_t *node){
+    node_t *current = node;
+    if (current == NULL)
+        return current;
+    while (current->right != NULL)
+        current = current->right;
+    return current;
 }
